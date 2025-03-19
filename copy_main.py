@@ -42,39 +42,7 @@ def add_one_in_cross_validation(labels, features_values, num_instances, current_
     return accuracy
 
 
-# Cross validation w/ removing a feature
-def leave_one_out_cross_validation(labels, features_values, num_instances, current_set, feature_to_remove, current_set_distances):
-    
-    num_correctly_classified = 0
 
-    for i in range(num_instances):
-
-        object_to_classify = features_values[i]
-        label_object_to_classify = labels[i]
-
-        nearest_neighbor_distance = float('inf')
-        nearest_neighbor_location = float('inf')
-
-        for k in range(num_instances):
-
-            if k != i: # if k != i, compare the ith instance to kth instance
-
-                object_to_compare = features_values[k]
-
-                # Euclidean distance: straight line distance btw two points in multi-dimensional space
-                # sqrt of sum of sqrd differences of features
-                distance = current_set_distances[i][k] - ((object_to_classify[feature_to_remove - 1] - object_to_compare[feature_to_remove - 1]) ** 2)
-            
-                if distance < nearest_neighbor_distance:
-                    nearest_neighbor_distance = distance
-                    nearest_neighbor_location = k + 1
-                    nearest_neighbor_label = labels[k]
-
-        if label_object_to_classify == nearest_neighbor_label:
-            num_correctly_classified = num_correctly_classified + 1
-
-    accuracy = num_correctly_classified / num_instances
-    return accuracy
 
 
 # Searches through tree to find the most accurate set of features
@@ -89,7 +57,7 @@ def forward_selection_search(list_of_instances, num_instances, num_features, def
     labels = data[:, 0].astype(int)
     features_values = data[:, 1:]
 
-    current_set_distances = [ [0] * num_instances for i in range(num_instances)]
+    current_set_distances = [[0] * num_instances for i in range(num_instances)]
     
     print("Beginning search.")
     print()
@@ -141,6 +109,50 @@ def forward_selection_search(list_of_instances, num_instances, num_features, def
     return best_set_of_features, best_set_of_features_accuracy
 
 
+
+# Cross validation w/ removing a feature
+def leave_one_out_cross_validation(labels, features_values, num_instances, current_set, feature_to_remove, current_set_distances):
+    
+    num_correctly_classified = 0
+
+    for i in range(num_instances):
+
+        object_to_classify = features_values[i]
+        label_object_to_classify = labels[i]
+
+        nearest_neighbor_distance = float('inf')
+        nearest_neighbor_location = float('inf')
+
+        for k in range(num_instances):
+
+            if k != i: # if k != i, compare the ith instance to kth instance
+
+                object_to_compare = features_values[k]
+
+                # Euclidean distance: straight line distance btw two points in multi-dimensional space
+                # sqrt of sum of sqrd differences of features
+                if feature_to_remove == 0:
+                    distance = 0
+                    for feature in current_set:
+                        distance += (object_to_classify[feature - 1] - object_to_compare[feature - 1]) ** 2
+                    current_set_distances[i][k] = distance
+                else:
+                    distance = current_set_distances[i][k] - ((object_to_classify[feature_to_remove - 1] - object_to_compare[feature_to_remove - 1]) ** 2)
+                # current_set_distances[i][k] = distance
+            
+                if distance < nearest_neighbor_distance:
+                    nearest_neighbor_distance = distance
+                    nearest_neighbor_location = k + 1
+                    nearest_neighbor_label = labels[k]
+
+        if label_object_to_classify == nearest_neighbor_label:
+            num_correctly_classified = num_correctly_classified + 1
+
+    accuracy = num_correctly_classified / num_instances
+    return accuracy, current_set_distances
+
+
+
 # Searches through tree to find the most accurate set of features
 # Starts with all features in current set, and slowly removes and checks features
 def backward_elimination_search(list_of_instances, num_instances, num_features):
@@ -152,21 +164,11 @@ def backward_elimination_search(list_of_instances, num_instances, num_features):
     best_set_of_features = []
     current_set_of_features = [feature + 1 for feature in range(num_features)] # all features initially
 
-    # current set distances
     current_set_distances = [[0] * num_instances for i in range(num_instances)]
-    for l in range(num_instances):
-        object_to_classify = features_values[l]
-        for j in range(num_instances):
-            object_to_compare = features_values[j]
-
-            distance = 0
-            for feature in current_set_of_features:
-                distance += (object_to_classify[feature - 1] - object_to_compare[feature - 1]) ** 2
-            current_set_distances[l][j] = distance
 
     # accuracy of using entire set
     # using 0, so don't remove any feature and calc accuracy
-    best_set_of_features_accuracy = leave_one_out_cross_validation(labels, features_values, num_instances, current_set_of_features, 0, current_set_distances)
+    best_set_of_features_accuracy, current_set_distances = leave_one_out_cross_validation(labels, features_values, num_instances, current_set_of_features, 0, current_set_distances)
 
     
     print(f"Accuracy of {{{",".join(str(feature) for feature in current_set_of_features)}}}: {best_set_of_features_accuracy}")
@@ -181,7 +183,7 @@ def backward_elimination_search(list_of_instances, num_instances, num_features):
         for k in range(1, num_features + 1):
             if k in current_set_of_features:
                 # accuracy w/o a certain feature (k)
-                accuracy = leave_one_out_cross_validation(labels, features_values, num_instances, current_set_of_features, k, current_set_distances)
+                accuracy, current_set_distances = leave_one_out_cross_validation(labels, features_values, num_instances, current_set_of_features, k, current_set_distances)
 
                 # if-else for trace printing
                 if current_set_of_features:
@@ -195,7 +197,7 @@ def backward_elimination_search(list_of_instances, num_instances, num_features):
 
         current_set_of_features.remove(feature_to_remove_at_this_level)
 
-         # current set distances
+        # current set distances
         for l in range(num_instances):
             object_to_classify = features_values[l]
             for j in range(num_instances):
