@@ -79,3 +79,6 @@ def leave_one_out_cross_validation(list_of_instances, num_instances, current_set
 
     accuracy = num_correctly_classified / num_instances
     return accuracy
+
+
+

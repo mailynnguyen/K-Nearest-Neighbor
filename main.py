@@ -47,7 +47,7 @@ def main():
     default_rate = size_most_common_class / num_instances
 
     print()
-    print(f"This dataset has {num_features} (not including the class attribute), with {num_instances} instances.")
+    print(f"This dataset has {num_features} (not including the class attribute) features, with {num_instances} instances.")
     print()
 
     result = []
