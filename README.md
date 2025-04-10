@@ -2,6 +2,8 @@
 
 ### To Run:
 
+(requires Python and VSCode)
+
 1. Clone the repo in your terminal
 2. Once in the correct project directory, run ``python main.py``
 
