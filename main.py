@@ -1,3 +1,4 @@
+import cProfile
 import search
 
 # GOAL: Nearest Neighbor Classifier
@@ -19,7 +20,7 @@ def main():
     user_input_search = input()
     
     data_file = open(user_input_file, 'r')
-    data_objects = data_file.readlines() #list with each element being a line of text from file (one data object)
+    data_objects = data_file.readlines() # list with each element being a line of text from file (one data object)
     num_instances = len(data_objects)
     num_features = len(data_objects[0].split()) - 1
 
@@ -47,19 +48,21 @@ def main():
     default_rate = size_most_common_class / num_instances
 
     print()
-    print(f"This dataset has {num_features} (not including the class attribute) features, with {num_instances} instances.")
+    print(f"This dataset has {num_features} (not including the class attribute), with {num_instances} instances.")
     print()
 
     result = []
     if int(user_input_search) == 1:
         result = search.forward_selection_search(data_objects, num_instances, num_features, default_rate)
     elif int(user_input_search) == 2:
-        result = search.backward_elimination_search(data_objects, num_instances, num_features)
+        result = search.backward_elimination_search(data_objects, num_instances, num_features, default_rate)
     else:
         print("Invalid Search Choice.")
         return
     
     best_set_of_features, accuracy = result
-    print(f"Finished search!! The best feature subset is {{{",".join(str(feature) for feature in best_set_of_features)}}}, which has an accuracy of {accuracy}")
+    print(f"Finished search!! The best feature subset is {{{",".join(str(feature) for feature in best_set_of_features)}}}, which has an accuracy of {accuracy * 100:.1f}%")
 
-main()
+# main()
+
+cProfile.run('main()')
