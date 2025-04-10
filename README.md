@@ -1,13 +1,9 @@
-## Note:
-
-``copy_main.py`` is the final copy
-
 # K-Nearest-Neighbor (KNN)
 
 ### To Run:
 
 1. Clone the repo in your terminal
-2. Once in the correct project directory, run ``python copy_main.py``
+2. Once in the correct project directory, run ``python main.py``
 
 ### Summary:
 
