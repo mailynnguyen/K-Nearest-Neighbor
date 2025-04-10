@@ -2,7 +2,7 @@
 
 ``copy_main.py`` is the final copy
 
-# Summary
+# K-Nearest-Neighbor (KNN)
 
 ### To Run:
 
