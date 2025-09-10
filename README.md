@@ -1,4 +1,4 @@
-# K-Nearest-Neighbor (KNN)
+# K-Nearest-Neighbor (KNN) Search
 
 ### To Run:
 
